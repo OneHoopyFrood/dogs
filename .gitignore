@@ -6,3 +6,5 @@ dist/
 .idea/
 dogs/__pycache__/
 venv/
+.venv
+.vscode
