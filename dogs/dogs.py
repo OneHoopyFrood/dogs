@@ -31,28 +31,13 @@ class DOGS:
     def create_from_snapshot(self, snapshot):
         my_droplets = self.manager.get_all_droplets()
         keys = self.manager.get_all_sshkeys()
-        volume_config = self.config.get('volume', {})
-        volume_id = volume_config.id or None
-        volume_name = volume_config.name or None
 
-        if volume_id is not None:
-            assert volume_name is not None, "Volume name must be set if volume id is set"
-
-            mount_point = volume_config.get('mount', '/mnt/volume')
+        if isinstance(self.config.startup_sh, list):
             user_data = f"""
-            #cloud-config
-            runcmd:
-            - mkdir -p {mount_point}
-            - mount /dev/disk/by-id/scsi-0DO_Volume_{volume_name} {mount_point}
-            """
-
-        if 'run_on_startup' in self.config.behaviors:
-            if user_data is None:
-                user_data = f"""
                 #cloud-config
                 runcmd:
                 """
-            user_data += self.config.behaviors.run_on_startup
+            user_data += '\n - '.join(list(self.config.startup_sh))
 
         for drop in my_droplets:
             assert drop.name != self.name, "Droplet already exists"
@@ -62,7 +47,6 @@ class DOGS:
             image=snapshot.id,
             region=self.config.get('region', "nyc1"),
             ssh_keys=keys,
-            volumes=[volume_id] if volume_id else [],
             user_data=user_data or None,
             monitoring=True,
             token=self.token,
@@ -125,7 +109,7 @@ class DOGS:
             firewall.add_droplets([self.droplet.id])
 
     def destroy(self, cleanup=True):
-        if self.config.behaviors.shutdown_before_destroy:
+        if self.config.shutdown_before_destroy:
             print(f"Shutting down droplet: ${self.name}")
             shutdown_info = self.droplet.shutdown()
             shutdown_action = self.droplet.get_action(shutdown_info['action']['id'])

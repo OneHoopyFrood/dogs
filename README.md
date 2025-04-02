@@ -35,7 +35,8 @@ python -m dogs
 - You can always find this information in the Accounts > Security section by
   selecting one of the keys and hitting “Edit”.
 
-4. If you hook a firewall up to the droplet you will also need that ID, which can you retrieve via the API.
+4. If you hook a firewall up to the droplet you will also need that ID, which
+   can you retrieve via the API.
 
 ### Droplet setup
 
@@ -48,21 +49,9 @@ back down later**.
 
 ### DOGS Server Config
 
-When you got all the prerequisites, add them to the config.yaml file.
+When you got all the prerequisites, add them to the [config.yaml](config.yaml.example) file.
 
-```yaml
-token: <your 64 character hex string>
-servers:
-  <server name>:
-    ## A full list of regions and sizes is available through the API
-    region: nyc1
-    size: s-1vcpu-2gb
-    firewall_id: <unique hex string separated by dashes>
-    snapshot_max: 2 # The number of snapshots to keep stored, extra's will be deleted
-    ssh_key: <8 digits from end of ssh public cert>
-```
-
-#### Binary (EXE) files
+### _Binary (EXE) files_
 
 If you want to package it into an easy to use exe (can also modify for mac or
 linux binaries), just use the included build scripts.
